@@ -1,34 +1,50 @@
 ﻿using Journey.Communication.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Journey.Communication.Responses;
+using Journey.Exception;
+using Journey.Exception.ExceptionsBase;
+using Journey.Infrastructure;
+using Journey.Infrastructure.Entities;
 
 namespace Journey.Application.UseCases.Trips.Register
 {
     public class RegisterTripUseCase
     {
-        public void Execute(RequestRegisterTripJson tripJson)
+        public ResponseShortTripJson Execute(RequestRegisterTripJson tripJson)
         {
             validate(tripJson);
+            var dbContext = new JourneyDbContext();
+            var entity = new Trip
+            {
+                Name = tripJson.Name,
+                StartDate = tripJson.StartDate,
+                EndDate = tripJson.EndDate,
+            };
+            dbContext.Trips.Add(entity);
+            dbContext.SaveChanges();
+
+            return new ResponseShortTripJson
+            {
+                EndDate = entity.EndDate,
+                StartDate = entity.StartDate,
+                Name = entity.Name,
+            };
         }
 
         private void validate(RequestRegisterTripJson tripJson)
         {
             if(string.IsNullOrWhiteSpace(tripJson.Name))
             {
-                throw new ArgumentException("Nome não pode ser vazio.");
+                throw new JourneyException(ResourceErrorMessages.NAME_EMPTY);
             }
 
-            if(tripJson.StartDate < DateTime.UtcNow)
+            if(tripJson.StartDate.Date < DateTime.UtcNow.Date)
             {
-                throw new ArgumentException("A viagem não pode ser registrada para uma data passada.");
+                throw new JourneyException(ResourceErrorMessages.DATE_TRIP_MUST_BE_LATER_THAN_TODAY);
             }
 
-            if (tripJson.EndDate >= DateTime.UtcNow)
+            if (tripJson.EndDate.Date < DateTime.UtcNow.Date)
             {
-                throw new ArgumentException("A viagem não pode ser registrada para uma data passada.");
+                throw new JourneyException(ResourceErrorMessages.END_DATE_TRIP_MUST_BE_LATER_START_DATE);
             }
         }
     }
