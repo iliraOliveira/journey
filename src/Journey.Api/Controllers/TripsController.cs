@@ -1,4 +1,5 @@
-﻿using Journey.Application.UseCases.Trips.GetAll;
+﻿using Journey.Application.UseCases.Trips.Delete;
+using Journey.Application.UseCases.Trips.GetAll;
 using Journey.Application.UseCases.Trips.GetById;
 using Journey.Application.UseCases.Trips.Register;
 using Journey.Communication.Requests;
@@ -17,20 +18,9 @@ namespace Journey.Api.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public IActionResult Register([FromBody] RequestRegisterTripJson tripJson)
         {
-            try
-            {
-                var useCase = new RegisterTripUseCase();
-                var response = useCase.Execute(tripJson);
-                return Created(string.Empty, response);
-            }
-            catch (JourneyException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erro desconhecido");
-            }
+            var useCase = new RegisterTripUseCase();
+            var response = useCase.Execute(tripJson);
+            return Created(string.Empty, response);
         }
 
         [HttpGet]
@@ -48,20 +38,20 @@ namespace Journey.Api.Controllers
         [ProducesResponseType(typeof(ResponseTripJson), StatusCodes.Status404NotFound)]
         public IActionResult GetById([FromRoute] Guid id) 
         {
-            try
-            {
-                var useCase = new GetTripByIdUseCase();
-                var response = useCase.Execute(id);
-                return Ok(response);
-            }
-            catch (JourneyException ex) 
-            {
-                return NotFound(ex.Message);
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erro desconhecido");
-            }
+            var useCase = new GetTripByIdUseCase();
+            var response = useCase.Execute(id);
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseTripJson), StatusCodes.Status404NotFound)]
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            var useCase = new DeleteTripById();
+            useCase.Execute(id);
+            return NoContent();
         }
     }
 }
