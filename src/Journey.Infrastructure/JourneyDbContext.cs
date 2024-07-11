@@ -9,7 +9,7 @@ namespace Journey.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=C:\Development\repos\nlw\JourneyDatabase.db"); 
+            optionsBuilder.UseSqlite("Data Source=C:\\Development\\repos\\nlw\\JourneyDatabase.db"); 
         }
     }
 }
