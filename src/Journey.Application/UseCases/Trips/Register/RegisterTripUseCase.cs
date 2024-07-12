@@ -38,6 +38,7 @@ namespace Journey.Application.UseCases.Trips.Register
             if(!result.IsValid)
             {
                var errorMessages = result.Errors.Select(error => error.ErrorMessage).ToList();
+                throw new ErrorOnValidateException(errorMessages);
             }
         }
     }

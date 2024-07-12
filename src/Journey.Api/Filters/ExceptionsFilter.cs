@@ -1,3 +1,4 @@
+using Journey.Communication.Responses;
 using Journey.Exception.ExceptionsBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -13,12 +14,22 @@ public class ExceptionFilter : IExceptionFilter
             var journeyException = (JourneyException)context.Exception;
 
             context.HttpContext.Response.StatusCode = (int)journeyException.GetStatusCode();
-            context.Result = new ObjectResult(context.Exception.Message);
+
+            var responseJson = new ResponseErrosJSon(journeyException.GetErrorMessages());
+
+            context.Result = new ObjectResult(responseJson);
         }
         else
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            context.Result = new ObjectResult("Erro desconhecido");
+
+            var list = new List<string>
+            {
+                "Erro desconhecido;"
+            };
+
+            var responseJson = new ResponseErrosJSon(list);
+            context.Result = new ObjectResult(responseJson);
         }
     }
 }
